@@ -25,7 +25,7 @@ Router\before(function($action) {
 
     $ignore_actions = array('js', 'login', 'google-auth', 'google-redirect-auth', 'mozilla-auth', 'public', 'show_public');
 
-    if ( ! isset($action) ) {
+    if ( ! isset($_SESSION['user']) && ! isset($action) ) {
         Response\redirect('?action=public');
     } else
     if (! isset($_SESSION['user']) && ! in_array($action, $ignore_actions)) {
