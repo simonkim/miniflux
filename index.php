@@ -23,8 +23,11 @@ Session\open(dirname($_SERVER['PHP_SELF']));
 // Called before each action
 Router\before(function($action) {
 
-    $ignore_actions = array('js', 'login', 'google-auth', 'google-redirect-auth', 'mozilla-auth');
+    $ignore_actions = array('js', 'login', 'google-auth', 'google-redirect-auth', 'mozilla-auth', 'public', 'show_public');
 
+    if ( ! isset($action) ) {
+        Response\redirect('?action=public');
+    } else
     if (! isset($_SESSION['user']) && ! in_array($action, $ignore_actions)) {
         Response\redirect('?action=login');
     }
@@ -134,6 +137,27 @@ Router\get_action('show', function() {
             $nav = Model\get_nav_item($item, array('unread', 'read'), array(1));
             break;
     }
+
+    Response\html(Template\layout('show_item', array(
+        'nb_unread_items' => isset($nb_unread_items) ? $nb_unread_items : null,
+        'item' => $item,
+        'feed' => $feed,
+        'item_nav' => isset($nav) ? $nav : null,
+        'menu' => $menu,
+        'title' => $item['title']
+    )));
+});
+
+// Show item public
+Router\get_action('show_public', function() {
+
+    $id = Request\param('id');
+    $menu = Request\param('menu');
+    $item = Model\get_item($id);
+    $feed = Model\get_feed($item['feed_id']);
+
+    $nav = Model\get_nav_item($item);
+    $nb_unread_items = Model\count_items('unread');
 
     Response\html(Template\layout('show_item', array(
         'nb_unread_items' => isset($nb_unread_items) ? $nb_unread_items : null,
@@ -864,6 +888,32 @@ Router\get_action('unlink-account-provider', function() {
     Response\redirect('?action=config');
 });
 
+
+// Display items - anonymous
+Router\get_action('public', function() {
+
+    Model\autoflush();
+
+    $order = Request\param('order', 'updated');
+    $direction = Request\param('direction', Model\get_config_value('items_sorting_direction'));
+    $offset = Request\int_param('offset', 0);
+    $items = Model\get_items('unread', $offset, Model\get_config_value('items_per_page'), $order, $direction);
+    $nb_items = Model\count_items('unread');
+
+    if ($nb_items === 0) Response\redirect('?action=feeds&nothing_to_read=1');
+
+    Response\html(Template\layout('public_items', array(
+        'order' => $order,
+        'direction' => $direction,
+        'items' => $items,
+        'nb_items' => $nb_items,
+        'nb_unread_items' => $nb_items,
+        'offset' => $offset,
+        'items_per_page' => Model\get_config_value('items_per_page'),
+        'title' => 'Miniflux ('.$nb_items.')',
+        'menu' => 'public'
+    )));
+});
 
 // Display unread items
 Router\notfound(function() {

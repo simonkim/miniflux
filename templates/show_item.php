@@ -38,7 +38,11 @@
                 >☆</a>
             <?php endif ?> |
 
-            <a href="?action=feed-items&amp;feed_id=<?= $feed['id'] ?>"><?= Helper\escape($feed['title']) ?></a> |
+	    <?php if ( $menu === 'public' ): ?>
+                <?= Helper\escape($feed['title']) ?> |
+            <?php else: ?>
+                <a href="?action=feed-items&amp;feed_id=<?= $feed['id'] ?>"><?= Helper\escape($feed['title']) ?></a> |
+            <?php endif ?>
 
             <span class="hide-mobile"><?= dt('%e %B %Y %k:%M', $item['updated']) ?> |</span>
 
@@ -61,7 +65,7 @@
         <nav>
             <span class="nav-left">
                 <?php if ($item_nav['previous']): ?>
-                    <a href="?action=show&amp;menu=<?= $menu ?>&amp;id=<?= $item_nav['previous']['id'] ?>" id="previous-item" title="<?= t($item_nav['previous']['title']) ?>">« <?= t('Previous') ?></a>
+		    <a href="?action=<?= $menu === 'public' ? "show_public" : "show"?>&amp;menu=<?= $menu ?>&amp;id=<?= $item_nav['previous']['id'] ?>" id="previous-item" title="<?= t($item_nav['previous']['title']) ?>">« <?= t('Previous') ?></a>
                 <?php else: ?>
                     « <?= t('Previous') ?>
                 <?php endif ?>
@@ -81,7 +85,7 @@
 
             <span class="nav-right">
                 <?php if ($item_nav['next']): ?>
-                    <a href="?action=show&amp;menu=<?= $menu ?>&amp;id=<?= $item_nav['next']['id'] ?>" id="next-item" title="<?= t($item_nav['next']['title']) ?>"><?= t('Next') ?> »</a>
+		    <a href="?action=<?= $menu === 'public' ? "show_public" : "show"?>&amp;menu=<?= $menu ?>&amp;id=<?= $item_nav['next']['id'] ?>" id="next-item" title="<?= t($item_nav['next']['title']) ?>"><?= t('Next') ?> »</a>
                 <?php else: ?>
                     <?= t('Next') ?> »
                 <?php endif ?>

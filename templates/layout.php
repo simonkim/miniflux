@@ -18,6 +18,11 @@
             <nav>
                 <a class="logo" href="?">mini<span>flux</span></a>
                 <ul>
+<?php if (isset($menu) && $menu === 'public') {?>
+                    <li <?= isset($menu) && $menu === 'public' ? 'class="active"' : '' ?>>
+                        <a href="?action=public"><?= t('public') ?> <span id="nav-counter"><?= isset($nb_unread_items) ? '('.$nb_unread_items.')' : '' ?></span></a>
+                    </li>
+<?php } else { ?>
                     <li <?= isset($menu) && $menu === 'unread' ? 'class="active"' : '' ?>>
                         <a href="?action=unread"><?= t('unread') ?> <span id="nav-counter"><?= isset($nb_unread_items) ? '('.$nb_unread_items.')' : '' ?></span></a>
                     </li>
@@ -36,6 +41,7 @@
                     <li>
                         <a href="?action=logout"><?= t('logout') ?></a>
                     </li>
+<?php } ?>
                 </ul>
             </nav>
         </header>
